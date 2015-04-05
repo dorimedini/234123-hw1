@@ -1,3 +1,9 @@
+/**
+ * Put this in:
+ * /usr/src/linux...custom/arch/i386/kernel/
+ */
+
+
 #include "../../../include/linux/syscall_maxproc.h"
 //#include "../../../include/linux/sched.h"
 #include <sched.h>

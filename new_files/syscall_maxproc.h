@@ -1,3 +1,8 @@
+/**
+ * Put this in:
+ * /usr/src/linux...custom/include/linux/
+ */
+
 #ifndef _SYSCALL_MAXPROC_H
 #define _SYSCALL_MAXPROC_H
 
@@ -72,8 +77,6 @@ int set_child_max_proc_wrapper(int limit) {
 	}									// correct +- sign?
 	return (int)(__res);
 }
-
-
 int get_max_proc_wrapper() {
 	long __res;
 	__asm__ volatile (
@@ -89,8 +92,6 @@ int get_max_proc_wrapper() {
 	}									// correct +- sign?
 	return (int)(__res);
 }
-
-
 int get_subproc_count_wrapper() {
 	long __res;
 	__asm__ volatile (
