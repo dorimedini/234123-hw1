@@ -1,7 +1,23 @@
-1. Correct return values for all functions
-2. Creating more processes than allowed
-3. Setting child_max_proc() to:
-   a. The same value twice
-   b. A negative value
-   c. Zero
-4. Call child_max_proc() lots of times before a fork() call
+1.  Correct return values for all functions
+2.  Creating more processes than allowed
+3.  Setting child_max_proc() to:
+    a. The same value twice
+    b. A negative value
+    c. Zero
+4.  Call child_max_proc() lots of times before a fork() call
+5.  Make sure orphaned process correctly gets it's grandfather's 
+    limit
+6.  Test correct clone handling
+7.  Make sure get_max_proc() returns the actual limitation imposed
+    on the process, not it's children
+8.  Make sure get_max_proc() returns new limitations imposed on
+    an orphaned process
+9.  Make sure get_subproc() correctly counts:
+    a. Zombie processes (at this point I don't know if they
+	   count or not)
+	b. Processes added to the subtree via brother-adoption (can
+	   happen after cloning, maybe)
+10. Try creating a situation where a process has more than the
+    allowed number of processes (can be done with CLONE) and make
+	sure the process can't make more until enough of it's children
+	have died
