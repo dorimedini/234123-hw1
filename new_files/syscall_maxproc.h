@@ -1,13 +1,13 @@
 /**
  * Put this in:
- * /usr/src/linux-2.4.18-14custom/include/linux/
+ * /usr/include/
  */
 
 #ifndef _SYSCALL_MAXPROC_H
 #define _SYSCALL_MAXPROC_H
 
-//#include <errno.h>
-#include "/usr/include/errno.h"
+#include <errno.h>
+//#include "/usr/include/errno.h"
 extern int errno;
 
 /**
