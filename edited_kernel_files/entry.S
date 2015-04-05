@@ -1,3 +1,8 @@
+/**
+ * Put this in:
+ * /usr/src/linux-2.4.18-14custom/arch/i386/kernel/
+ */ 
+
 /*
  *  linux/arch/i386/entry.S
  *

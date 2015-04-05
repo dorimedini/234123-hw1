@@ -1,6 +1,6 @@
 /**
  * Put this in:
- * /usr/src/linux...custom/include/linux/
+ * /usr/src/linux-2.4.18-14custom/include/linux/
  */
 
 #ifndef _SYSCALL_MAXPROC_H
