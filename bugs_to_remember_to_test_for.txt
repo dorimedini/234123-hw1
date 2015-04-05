@@ -1,0 +1,7 @@
+1. Correct return values for all functions
+2. Creating more processes than allowed
+3. Setting child_max_proc() to:
+   a. The same value twice
+   b. A negative value
+   c. Zero
+4. Call child_max_proc() lots of times before a fork() call
