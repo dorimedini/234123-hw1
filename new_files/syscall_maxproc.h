@@ -6,7 +6,7 @@
 #ifndef _SYSCALL_MAXPROC_H
 #define _SYSCALL_MAXPROC_H
 
-#include <errno.h>
+#include "/usr/include/errno.h"
 extern int errno;
 
 /**
