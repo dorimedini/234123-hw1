@@ -5,8 +5,8 @@
 
 
 #include "../../../include/linux/syscall_maxproc.h"
-//#include "../../../include/linux/sched.h"
-#include <sched.h>
+#include "../../../include/linux/sched.h"
+//#include <sched.h> Doesn't find this
 
 
 
