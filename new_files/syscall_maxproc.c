@@ -4,11 +4,9 @@
  */
 
 
-//#include "syscall_maxproc.h"
-//#include "../../../include/linux/sched.h"
-#include "linux/sched.h"
-//#include <sched.h> Doesn't find this
-
+#include <linux/sched.h>
+#include <linux/errno.h>
+extern int errno;
 
 
 /**
@@ -18,6 +16,7 @@ int sys_set_child_max_proc(int limit) {
 	
 	if (current->max_proc_from_above <= limit &&	// Make sure the child isn't trying to
 		current->max_proc_from_above >= 0) {		// override the parent limit.
+		errno = -EINVAL;
 		return -1;
 	}
 	
