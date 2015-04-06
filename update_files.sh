@@ -3,6 +3,9 @@
 cp -vu /mnt/hgfs/HW/234123-hw1/new_files/test.c /root/tests/
 cd /root/tests
 dos2unix test.c
+cp -vu /mnt/hgfs/HW/234123-hw1/new_files/c_test_utils.h /root/tests/
+cd /root/tests
+dos2unix c_test_utils.h
 cp -vu /mnt/hgfs/HW/234123-hw1/new_files/syscall_maxproc.c /usr/src/linux-2.4.18-14custom/arch/i386/kernel/
 cd /usr/src/linux-2.4.18-14custom/arch/i386/kernel
 dos2unix syscall_maxproc.c
