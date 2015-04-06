@@ -33,7 +33,15 @@ extern int errno;
  * - Returns 0 if successful
  */
 int set_child_max_proc(int limit) {
-	return set_child_max_proc_wrapper(limit);
+	
+	int ret = set_child_max_proc_wrapper(limit);
+	
+	if (ret == -1) {			// Attempted to override parent limit
+		errno = EPERM;
+	}
+	
+	return ret;
+	
 }
 
 /**
