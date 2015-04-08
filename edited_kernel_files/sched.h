@@ -577,8 +577,7 @@ extern struct exec_domain	default_exec_domain;
 	\
 	max_proc_from_above:	-1,					\
 	max_proc_for_children:	-1,					\
-	subtree_size: 			0,					\
-	real_dad:				&tsk				\
+	subtree_size: 			0					\
 }
 
 
