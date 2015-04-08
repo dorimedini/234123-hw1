@@ -1,0 +1,7 @@
+TODO:
+1. The do_fork check where we test whether or not we can fork a process:
+   must it be atomic? Can we assume we'll complete the tests + field updates
+   in one go? Otherwise, two processes may think they can fork themselves
+   when really only one can...
+2. Same question for child field updates: when we set older_sibling for
+   a process, maybe another sibling is being created at the same time...
