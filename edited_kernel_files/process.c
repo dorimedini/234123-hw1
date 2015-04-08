@@ -764,56 +764,9 @@ void activate_task(struct task_struct *tsk_p)
 }
 #endif
 
-/**
- * HW1:
- * 
- * Override the default fork() behaviour.
- *
- * First, check that the process may create
- * new processes. This should be done by an
- * upward search through the tree of processes,
- * checking any ACTIVE LIMITATIONS (this is
- * important: NOT the child limitation of the
- * ancestors - which may change over time - but the
- * SELF limitation) and making sure the total
- * number of processes plus on (this new one) doesn't
- * exceed the limit.
- *
- * Next, fork the process.
- *
- * When done, update the new process's data:
- * pointers to relatives (5 pointers need
- * updating), set the self-limitation to the
- * father's child limit and set the child-limit
- * to -1.
- *
- * Note: we may need to change the behaviour of
- * do_fork() and not fork() due to possible clone()
- * calls.
- *
- * Return values:
- * - If no fork was done (too many children),
- *   return -1 and set errno to EAGAIN
- */
 asmlinkage int sys_fork(struct pt_regs regs)
 {
-// ORIGINAL
-//	return do_fork(SIGCHLD, regs.esp, &regs, 0);
-// END ORIGINAL
-/**
- * check if legal
- */
- int x = do_fork(SIGCHLD, regs.esp, &regs, 0);
-/**
- * check if successful. if not, return x
- */
-/**
- * update the tree with new number of processes
- * in each subtree
- */
-/**
- * now return x with correct errno etc
- */
+	return do_fork(SIGCHLD, regs.esp, &regs, 0);
 }
 
 asmlinkage int sys_clone(struct pt_regs regs)
