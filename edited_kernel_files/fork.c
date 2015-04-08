@@ -615,24 +615,6 @@ int do_fork(unsigned long clone_flags, unsigned long stack_start,
 	p->tux_info = NULL;
 	p->cpus_allowed_mask &= p->cpus_allowed;
 	
-	/** 
-	 * HW1: Field update
-	 *
-	 * Set the values of the new process's fields at this point.
-	 *
-	 * DO NOT UPDATE PARENT FIELDS YET! We still need to check if
-	 * this process's creation is legal!
-	 *
-	 * Some values were defined at the INIT_TASK macro in sched.h
-	 */
-	do {
-		p->real_dad = current;									// Who's your daddy?
-		p->real_youngest_child = p->real_oldest_child = NULL;	// No children yet
-		p->younger_sibling = NULL;								// No younger sibling
-		p->older_sibling = current->real_youngest_child;		// Older brother, at the time (?)
-		p->max_proc_from_above = current->max_proc_for_children;	// Set our limit
-	} while(0);
-
 	retval = -EAGAIN;
 	/*
 	 * Check if we are over our maximum process limit, but be sure to
@@ -651,33 +633,25 @@ int do_fork(unsigned long clone_flags, unsigned long stack_start,
 	 * and make sure (at each ancestor/self process P) that P->subtree_size
 	 * is less than (not equal to! we're adding one now!) P->max_proc_from_above.
 	 *
-	 * If so, increment all P->subtree_size values (including our own), update
-	 * some fields in the parent and continue.
-	 *
 	 * If not, goto bad_fork_free
 	 */
+	// DEBUG printk("In do_fork()\n   current->pid=%d\n",current->pid);
 	do {
 		// Iterate starting at ourselves (we need to check if we're making
 		// too many kids). Also note that this process may be the SWAPPER
 		// so add tests for pid != 0, apart from the climb until INIT.
-		task_t* proc;
-		for(proc = current; proc->pid != 1 && proc->pid != 0; proc = proc->real_dad) {
-			if (proc->max_proc_from_above <= proc->subtree_size &&	// Check if we've overreached the limit
+		struct task_struct *proc;
+		
+		// THIS FOR LOOP - EVEN WHEN IT DOES NOTHING - BREAKS THE BOOT
+		for(proc = current; proc && proc->pid != 1 && proc->pid != 0; proc = proc->real_dad) {
+/*			if (proc->max_proc_from_above <= proc->subtree_size &&	// Check if we've overreached the limit
 				proc->max_proc_from_above >= 0) {					// and that the limit exists
 				goto bad_fork_free;
 			}
-		}
-		
-		// We're good! Increment the subtree sizes along the hierarchy path.
-		for(proc = current; proc->pid != 1 && proc->pid != 0; proc = proc->real_dad) {
-			proc->subtree_size++;
-		}
-		
-		// Update some fields
-		current->real_youngest_child->younger_sibling = p;	// A new baby brother for you, my child!
-		current->real_youngest_child = p;					// My new favorite kid!
-		
+*/		}
 	} while(0);
+	/** END HW1 BLOCK */
+	
 
 	atomic_inc(&p->user->__count);
 	atomic_inc(&p->user->processes);
@@ -827,6 +801,47 @@ int do_fork(unsigned long clone_flags, unsigned long stack_start,
 
 	if (p->ptrace & PT_PTRACED)
 		send_sig(SIGSTOP, p, 1);
+	
+	
+	/**
+	 * HW1: We've come this far - now, update fields
+	 *
+	 * To do this, increment all P->subtree_size values
+	 * (including our own), update some fields in the
+	 * parent and then the child.
+	 */
+	do {
+		
+		// Update subtree sizes
+		struct task_struct *proc;
+		int dori = 0;
+/*		for (proc = current; proc && proc->pid != 1 && proc->pid != 0; proc = proc->real_dad) {
+			++dori;
+			if (dori > 5) break;
+			proc->subtree_size++;
+		}
+*/		
+		// Update new process's fields
+		p->real_dad = current;									// Who's your daddy?
+		p->real_youngest_child = p->real_oldest_child = NULL;	// No children yet
+		p->younger_sibling = NULL;								// No younger sibling
+		p->older_sibling = current->real_youngest_child;		// Older brother. This is OK even if p is an only child
+		p->max_proc_from_above = current->max_proc_for_children;// Set our limit
+		p->max_proc_for_children = -1;							// The default value was destroyed at *p=*current
+		p->subtree_size = 0;									// Ditto
+		
+		// Update some fields in the parent
+		if (current->real_youngest_child) {						// If I have a kid...
+			current->real_youngest_child->younger_sibling = p;	// A new baby brother for you, my child!
+			current->real_youngest_child = p;					// My new favorite kid!
+		}
+		else {													// If not, initialize the pointers
+			current->real_youngest_child = current->real_oldest_child = p;
+		}
+		
+	} while(0);
+	/** END HW1 BLOCK */
+	
 	wake_up_forked_process(p);	/* do this last */
 	++total_forks;
 	if (clone_flags & CLONE_VFORK)
