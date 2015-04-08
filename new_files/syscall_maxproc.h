@@ -69,6 +69,17 @@ int get_subproc_count() {
  * Wrapper functions (see user functions above
  * for documentation)
  */
+
+// Use this to get the correct return value from a system call.
+// If a system call returns in error, it will return the correct
+// value of ERRNO in negative format.
+long convert_to_errno(long res) {
+	if ((unsigned long)(res) >= (unsigned long)(-125)) {
+		errno = -(res); res = -1;
+	}
+	return res;
+}
+ 
 int set_child_max_proc_wrapper(int limit) {
 	long __res;
 	__asm__ volatile (
@@ -80,10 +91,7 @@ int set_child_max_proc_wrapper(int limit) {
 		: "m" ((long)limit)				// Input (%1 in the stack)
 		: "%eax","%ebx"					// Registers used
 	);
-	if ((unsigned long)(__res) >= (unsigned long)(-125)) {
-		errno = -(__res); __res = -1;	// Convert the output to have
-	}									// correct +- sign?
-	return (int)(__res);
+	return (int)convert_to_errno(__res);
 }
 int get_max_proc_wrapper() {
 	long __res;
@@ -95,10 +103,7 @@ int get_max_proc_wrapper() {
 		: 								// No input
 		: "%eax"						// Registers used
 	);
-	if ((unsigned long)(__res) >= (unsigned long)(-125)) {
-		errno = -(__res); __res = -1;	// Convert the output to have
-	}									// correct +- sign?
-	return (int)(__res);
+	return (int)convert_to_errno(__res);
 }
 int get_subproc_count_wrapper() {
 	long __res;
@@ -110,10 +115,7 @@ int get_subproc_count_wrapper() {
 		: 								// No input
 		: "%eax"						// Registers used
 	);
-	if ((unsigned long)(__res) >= (unsigned long)(-125)) {
-		errno = -(__res); __res = -1;	// Convert the output to have
-	}									// correct +- sign?
-	return (int)(__res);
+	return (int)convert_to_errno(__res);
 }
 
 

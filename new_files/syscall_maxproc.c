@@ -16,8 +16,7 @@ int sys_set_child_max_proc(int limit) {
 	
 	if (current->max_proc_from_above <= limit &&	// Make sure the child isn't trying to
 		current->max_proc_from_above >= 0) {		// override the parent limit.
-		errno = -EINVAL;
-		return -1;
+		return -EINVAL;
 	}
 	
 	current->max_proc_for_children = limit;			// Set the limit
