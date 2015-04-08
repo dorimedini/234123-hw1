@@ -630,7 +630,7 @@ int do_fork(unsigned long clone_flags, unsigned long stack_start,
 		p->real_youngest_child = p->real_oldest_child = NULL;	// No children yet
 		p->younger_sibling = NULL;								// No younger sibling
 		p->older_sibling = current->real_youngest_child;		// Older brother, at the time (?)
-		p->max_proc_from_above = parent->max_proc_for_children;	// Set our limit
+		p->max_proc_from_above = current->max_proc_for_children;	// Set our limit
 	} while(0);
 
 	retval = -EAGAIN;
@@ -660,15 +660,16 @@ int do_fork(unsigned long clone_flags, unsigned long stack_start,
 		// Iterate starting at ourselves (we need to check if we're making
 		// too many kids). Also note that this process may be the SWAPPER
 		// so add tests for pid != 0, apart from the climb until INIT.
-		for(task_t* proc = current; proc->pid != 1 && proc->pid != 0; proc = proc->real_dad) {
+		task_t* proc;
+		for(proc = current; proc->pid != 1 && proc->pid != 0; proc = proc->real_dad) {
 			if (proc->max_proc_from_above <= proc->subtree_size &&	// Check if we've overreached the limit
 				proc->max_proc_from_above >= 0) {					// and that the limit exists
-				goto bad_fork_tree;
+				goto bad_fork_free;
 			}
 		}
 		
 		// We're good! Increment the subtree sizes along the hierarchy path.
-		for(task_t* proc = current; proc->pid != 1 && proc->pid != 0; proc = proc->real_dad) {
+		for(proc = current; proc->pid != 1 && proc->pid != 0; proc = proc->real_dad) {
 			proc->subtree_size++;
 		}
 		
