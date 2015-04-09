@@ -52,14 +52,13 @@ static void release_task(struct task_struct * p)
 	do {
 		
 		// Adoption:
-/*		struct task_struct* proc;
-		int dori = 0;
+		struct task_struct* proc;
 		for (proc = p->real_oldest_child; proc; proc = proc->younger_sibling) {
-			++dori;
-			if (dori > 100) break;
+			printk("OMGOMGOMG:\n   p->pid=%d, should be equal to proc->real_dad->pid=%d\n",p->pid,proc->real_dad->pid);
 			proc->real_dad = p->real_dad;
+			printk("   Now, proc->real_dad->pid=%d where p->real_dad->pid=%d\n",proc->real_dad->pid,p->real_dad->pid);
 		}
-		
+/*		
 		// Disconnect from brothers:
 		if (p->older_sibling) {		// Tell big brother he has a new little brother
 			p->older_sibling->younger_sibling = p->younger_sibling;
