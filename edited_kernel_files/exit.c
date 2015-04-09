@@ -33,10 +33,72 @@ static void release_task(struct task_struct * p)
 #ifdef CONFIG_SMP
 	wait_task_inactive(p);
 #endif
+
+	/**
+	 * HW1: Cleanup on exit
+	 *
+	 * When a process is completely removed, several things
+	 * must happen:
+	 *
+	 * 1. All it's children must become it's parent's children.
+	 *    All children's pointers must be updated, and the parent
+	 *    process must tell it's original children they have new
+	 *    brothers (also, the parent process has a new youngest
+	 *    child). Also note that the dying process must be removed
+	 *    from it's sibling list.
+	 * 2. All along the ancestor path, the subtree counter must
+	 *    be decremented.
+	 */
+	do {
+		
+		// Adoption:
+		struct task_struct* proc;
+		int dori = 0;
+		for (proc = p->real_oldest_child; proc; proc = proc->younger_sibling) {
+			++dori;
+			if (dori > 100) break;
+			proc->real_dad = p->real_dad;
+		}
+/*		
+		// Disconnect from brothers:
+		if (p->older_sibling) {		// Tell big brother he has a new little brother
+			p->older_sibling->younger_sibling = p->younger_sibling;
+		}
+		if (p->younger_sibling) {	// Tell little brother he has a new big brother
+			p->younger_sibling->older_sibling = p->older_sibling;
+		}
+		
+		// Brotherly acceptance:
+		if (p == p->real_dad->real_youngest_child) {			// If the dying process is the youngest,
+			p->real_dad->real_youngest_child = p->older_sibling;// make it's older brother the new youngest
+		}
+		// Now, if the dying process had kids, it's eldest will now be the
+		// little brother of the youngest child of the grandpa process.
+		p->real_dad->real_youngest_child->younger_sibling = p->real_oldest_child;
+		if (p->real_oldest_child) {
+			p->real_oldest_child->older_sibling = p->real_dad->real_youngest_child;
+		}
+		
+		// New brother hierarchy:
+		// First, check if the dying process had children.
+		// Without checking this, we may accidentally NULLify
+		// the grandpa's real_youngest_child pointer even if
+		// grandpa does, in fact, have children of his own.
+		if (p->real_youngest_child) {
+			p->real_dad->real_youngest_child = p->real_youngest_child;
+		}
+		
+		// Subtree update (start at p, even though it seems redundant)
+		for (proc = p; proc && proc->pid != 1 && proc->pid != 0; proc = proc->real_dad) {
+			proc->subtree_size--;
+		}
+*/		
+	} while(0);
+	/** END HW1 BLOCK */
+	
 	atomic_dec(&p->user->processes);
 	free_uid(p->user);
 	unhash_process(p);
-
 	release_thread(p);
 	current->cmin_flt += p->min_flt + p->cmin_flt;
 	current->cmaj_flt += p->maj_flt + p->cmaj_flt;
