@@ -572,15 +572,21 @@ extern struct exec_domain	default_exec_domain;
     blocked:		{{0}},						\
     alloc_lock:		SPIN_LOCK_UNLOCKED,				\
     journal_info:	NULL,						\
-	\
-	\
-	\
 	max_proc_from_above:	-1,					\
 	max_proc_for_children:	-1,					\
 	subtree_size: 			0,					\
 	real_dad:				NULL,				\
+	real_youngest_child:	NULL,				\
+	real_oldest_child:		NULL,				\
+	older_sibling:			NULL,				\
+	younger_sibling:		NULL,				\
 }
-
+/**
+ * HW1:
+ *
+ * In the above macro INIT_TASK, we've added field values
+ * from max_proc_from_above to younger_sibling
+ */
 
 #ifndef INIT_TASK_SIZE
 # define INIT_TASK_SIZE	2048*sizeof(long)

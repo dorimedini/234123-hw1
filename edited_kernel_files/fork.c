@@ -641,14 +641,13 @@ int do_fork(unsigned long clone_flags, unsigned long stack_start,
 		// too many kids). Also note that this process may be the SWAPPER
 		// so add tests for pid != 0, apart from the climb until INIT.
 		struct task_struct *proc;
-		
-		// THIS FOR LOOP - EVEN WHEN IT DOES NOTHING - BREAKS THE BOOT
-		for(proc = current; proc && proc->pid != 1 && proc->pid != 0; proc = proc->real_dad) {
-/*			if (proc->max_proc_from_above <= proc->subtree_size &&	// Check if we've overreached the limit
+		for (proc = current; proc && proc->pid != 1 && proc->pid != 0; proc = proc->p_pptr) {	// Let's get this to work first
+//		for (proc = current; proc && proc->pid != 1 && proc->pid != 0; proc = proc->real_dad) {	// Desired behaviour
+			if (proc->max_proc_from_above <= proc->subtree_size &&	// Check if we've overreached the limit
 				proc->max_proc_from_above >= 0) {					// and that the limit exists
 				goto bad_fork_free;
 			}
-*/		}
+		}
 	} while(0);
 	/** END HW1 BLOCK */
 	
@@ -814,13 +813,11 @@ int do_fork(unsigned long clone_flags, unsigned long stack_start,
 		
 		// Update subtree sizes
 		struct task_struct *proc;
-		int dori = 0;
-/*		for (proc = current; proc && proc->pid != 1 && proc->pid != 0; proc = proc->real_dad) {
-			++dori;
-			if (dori > 5) break;
+//		for (proc = current; proc && proc->pid != 1 && proc->pid != 0; proc = proc->p_pptr) {	// Let's get this to work first
+		for (proc = current; proc && proc->pid != 1 && proc->pid != 0; proc = proc->real_dad) {	// Desired behaviour
 			proc->subtree_size++;
 		}
-*/		
+		
 		// Update new process's fields
 		p->real_dad = current;									// Who's your daddy?
 		p->real_youngest_child = p->real_oldest_child = NULL;	// No children yet
