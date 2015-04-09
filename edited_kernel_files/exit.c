@@ -51,14 +51,13 @@ static void release_task(struct task_struct * p)
 	 */
 	do {
 		
-		// Adoption:
 		struct task_struct* proc;
+		
+		// Adoption:
 		for (proc = p->real_oldest_child; proc; proc = proc->younger_sibling) {
-			printk("OMGOMGOMG:\n   p->pid=%d, should be equal to proc->real_dad->pid=%d\n",p->pid,proc->real_dad->pid);
 			proc->real_dad = p->real_dad;
-			printk("   Now, proc->real_dad->pid=%d where p->real_dad->pid=%d\n",proc->real_dad->pid,p->real_dad->pid);
 		}
-/*		
+		
 		// Disconnect from brothers:
 		if (p->older_sibling) {		// Tell big brother he has a new little brother
 			p->older_sibling->younger_sibling = p->younger_sibling;
@@ -68,29 +67,108 @@ static void release_task(struct task_struct * p)
 		}
 		
 		// Brotherly acceptance:
-		if (p == p->real_dad->real_youngest_child) {			// If the dying process is the youngest,
-			p->real_dad->real_youngest_child = p->older_sibling;// make it's older brother the new youngest
-		}
-		// Now, if the dying process had kids, it's eldest will now be the
-		// little brother of the youngest child of the grandpa process.
-		p->real_dad->real_youngest_child->younger_sibling = p->real_oldest_child;
-		if (p->real_oldest_child) {
-			p->real_oldest_child->older_sibling = p->real_dad->real_youngest_child;
-		}
-		
-		// New brother hierarchy:
-		// First, check if the dying process had children.
-		// Without checking this, we may accidentally NULLify
-		// the grandpa's real_youngest_child pointer even if
-		// grandpa does, in fact, have children of his own.
-		if (p->real_youngest_child) {
+		// 1. If p is the only child, the brotherly hierarchy in 
+		//    p's pointers is OK: simply transfer youngest to youngest,
+		//    oldest to oldest.
+		if (p == p->real_dad->real_youngest_child &&
+			p == p->real_dad->real_oldest_child) {
 			p->real_dad->real_youngest_child = p->real_youngest_child;
+			p->real_dad->real_oldest_child = p->real_oldest_child;
+		}
+		// 2. If p is the youngest of it's brothers and has olders
+		//    brothers, we need to get a handle on p's older brother:
+		//    he will be the one we connect p's orphans to. After we do
+		//    that, IF P HAD ANY KIDS, tell p's dad that his youngest
+		//    child is p's youngest child and let p's eldest know who.
+		//    his big brother is.
+		else if (p == p->real_dad->real_youngest_child) {
+			p->real_dad->real_youngest_child = p->older_sibling;
+			p->real_dad->real_youngest_child->younger_sibling = p->real_oldest_child;
+			if (p->real_oldest_child) {
+				p->real_oldest_child->older_sibling = p->real_dad->real_youngest_child;
+				p->real_dad->real_youngest_child = p->real_youngest_child;
+			}
+		}
+		// 3. If p is the eldest of it's brothers and has younger brothers,
+		//    it's simpler because we simply want to attach p's kids
+		//    to p's youngest brother.
+		//    Tell p's dad his new eldest is p's younger brother.
+		//    Next, tell p's dad's youngest he has a younger brother:
+		//    p's eldest.
+		//    IF P HAS KIDS: tell p's eldest who is big brother is (should
+		//    be p's dad's youngest at the moment) and tell p's dad that
+		//    his youngest is p's youngest.
+		else if (p == p->real_dad->real_oldest_child) {
+			p->real_dad->real_oldest_child = p->younger_sibling;
+			p->real_dad->real_youngest_child->younger_sibling = p->real_oldest_child;
+			if (p->real_oldest_child) {
+				p->real_oldest_child->older_sibling = p->real_dad->real_youngest_child;
+				p->real_dad->real_youngest_child = p->real_youngest_child;
+			}
+		}
+		// 4. Process p is a middle child.
+		//    In this case:
+		//    Tell p's dad's current youngest child that his little brother
+		//    is p's oldest child.
+		//    IF P HAS KIDS, tell his oldest that his older brother is p's
+		//    dad's youngest child, then tell dad that his youngest is p's
+		//    youngest.
+		else {
+			p->real_dad->real_youngest_child->younger_sibling = p->real_oldest_child;
+			if (p->real_oldest_child) {
+				p->real_oldest_child->older_sibling = p->real_dad->real_youngest_child;
+				p->real_dad->real_youngest_child = p->real_youngest_child;
+			}
 		}
 		
 		// Subtree update (start at p, even though it seems redundant)
 		for (proc = p; proc && proc->pid != 1 && proc->pid != 0; proc = proc->real_dad) {
 			proc->subtree_size--;
 		}
+
+/*		// DEBUG
+		printk("IN RELEASE_TASK(): KILLING PROCESS %d\n",p->pid);
+		printk("THE DYING PROCESS'S CHILDREN ARE:\n");
+		for (proc = p->real_oldest_child; proc; proc = proc->younger_sibling) {
+			printk("%d,",proc->pid);
+		}
+		printk("\nDONE PRINTING CHILDREN. PRINTING HIERARCHY:\n");
+		proc = p->real_dad;
+		printk("DOES proc->pid=%d == 9?\n",proc->pid);
+		printk("PROCESS 9 SHOULD HAVE NO CHILDREN: ");
+		printk(proc->real_oldest_child ? "UH OH... IT DOES\n" : "GOOD. IT DOESN'T\n");
+		printk("IS DADDY INIT? MY DAD == %d: IS IT 1?\n",proc->real_dad->pid);
+		printk("PRINTING BROTHERS, FROM YOUNGEST (9) TO OLDEST(2):\n");
+		while(proc->older_sibling) {
+			printk("%d,",proc->pid);
+			proc = proc->older_sibling;
+		}
+		printk("%d\n",proc->pid);
+		printk("PRINTING BROTHERS, FROM OLDEST (9) TO YOUNGEST(2):\n");
+		while(proc->younger_sibling) {
+			printk("%d,",proc->pid);
+			proc = proc->younger_sibling;
+		}
+		printk("%d\n",proc->pid);
+		printk("ARE ALL CHILDREN AWARE THEIR DADDY IS INIT? ");
+		int yes = 1;
+		for(proc = p->real_dad; proc; proc = proc->older_sibling) {
+			if (!proc->real_dad) {
+				printk("NOPE! NULL PTR AT PID==%d\n",proc->pid);
+				yes = 0;
+				break;
+			}
+			if (proc->real_dad->pid != 1) {
+				printk("NOPE! CHILD #%d\n THINKS DADDY=%d",proc->pid, proc->real_dad->pid);
+				yes = 0;
+				break;
+			}
+		}
+		if (yes) printk("YES!\n");
+		printk("INIT THINKS IT'S YOUNGEST IS %d AND IT'S OLDEST IS %d\n", p->real_dad->real_dad->real_youngest_child->pid,
+																		p->real_dad->real_dad->real_oldest_child->pid);
+		printk("ENTERING INFINITE LOOP...");
+		while(1) {}
 */		
 	} while(0);
 	/** END HW1 BLOCK */

@@ -635,21 +635,26 @@ int do_fork(unsigned long clone_flags, unsigned long stack_start,
 	 *
 	 * If not, goto bad_fork_free
 	 */
-	do {
+/*	static int do_fork_limit = 0;	// DEBUG
+*/	do {
+		
 		// Iterate starting at ourselves (we need to check if we're making
 		// too many kids). Also note that this process may be the SWAPPER
 		// so add tests for pid != 0, apart from the climb until INIT.
 		struct task_struct *proc;
 		for (proc = current; proc && proc->pid != 1 && proc->pid != 0; proc = proc->real_dad) {
-	//		printk("OMGOMGOMG:   proc->pid=%d\n", proc->pid);
-	//		if (proc->real_dad) {
-	//			printk("   proc->real_dad->pid=%d\n", proc->real_dad->pid);
-	//		}
 			if (proc->max_proc_from_above <= proc->subtree_size &&	// Check if we've overreached the limit
 				proc->max_proc_from_above >= 0) {					// and that the limit exists
 				goto bad_fork_free;
 			}
 		}
+		
+/*		do_fork_limit++;	// DEBUG
+		if (do_fork_limit == 15) {
+			
+			goto bad_fork_free;	// DEBUG
+		}
+*/		
 	} while(0);
 	/** END HW1 BLOCK */
 	
@@ -813,15 +818,29 @@ int do_fork(unsigned long clone_flags, unsigned long stack_start,
 	 */
 	do {
 		
+		// DEBUG
+/*		if (do_fork_limit < 15) {
+			printk("IN DO_FORK #%d, PRE-UPDATE\n", do_fork_limit);
+			printk("                        current->pid=%d\n", current->pid);
+			printk("                              p->pid=%d\n", p->pid);
+			if (p->real_dad)
+				printk("                  : p->real_dad->pid=%d\n", p->real_dad->pid);
+			if (current->real_youngest_child)
+				printk("   current->real_youngest_child->pid=%d\n", current->real_youngest_child->pid);
+			if (current->real_oldest_child)
+				printk("     current->real_oldest_child->pid=%d\n", current->real_oldest_child->pid);
+		}
+*/		
 		// Update subtree sizes
 		struct task_struct *proc;
-		for (proc = current; proc && proc->pid != 1 && proc->pid != 0; proc = proc->real_dad) {	// Desired behaviour
+		for (proc = current; proc && proc->pid != 1 && proc->pid != 0; proc = proc->real_dad) {
 			proc->subtree_size++;
 		}
 		
 		// Update new process's fields
 		p->real_dad = current;									// Who's your daddy?
-		p->real_youngest_child = p->real_oldest_child = NULL;	// No children yet
+		p->real_youngest_child = NULL;							// No children yet
+		p->real_oldest_child = NULL;
 		p->younger_sibling = NULL;								// No younger sibling
 		p->older_sibling = current->real_youngest_child;		// Older brother. This is OK even if p is an only child
 		p->max_proc_from_above = current->max_proc_for_children;// Set our limit
@@ -834,9 +853,31 @@ int do_fork(unsigned long clone_flags, unsigned long stack_start,
 			current->real_youngest_child = p;					// My new favorite kid!
 		}
 		else {													// If not, initialize the pointers
-			current->real_youngest_child = current->real_oldest_child = p;
+			current->real_youngest_child = p;
+			current->real_oldest_child = p;
 		}
 		
+/*		// DEBUG
+		if (do_fork_limit < 15) {
+			printk("IN DO_FORK #%d, AFTER-UPDATE\n", do_fork_limit);
+			printk("                        current->pid=%d\n", current->pid);
+			printk("                              p->pid=%d\n", p->pid);
+			if (p->real_dad)
+				printk("                  : p->real_dad->pid=%d\n", p->real_dad->pid);
+			if (current->real_youngest_child)
+				printk("   current->real_youngest_child->pid=%d\n", current->real_youngest_child->pid);
+			if (current->real_oldest_child)
+				printk("     current->real_oldest_child->pid=%d\n", current->real_oldest_child->pid);
+			if (do_fork_limit == 9) {
+				struct task_struct *init_proc = current;
+				printk("PRINTING INIT'S CHILDREN: WE SHOULD GET 1 == %d\n",init_proc->pid);
+				int i=0;
+				for (init_proc = init_proc->real_oldest_child; init_proc; init_proc = init_proc->younger_sibling) {
+					printk("   Child #%d: %d\n",++i,init_proc->pid);
+				}
+			}
+		}
+*/	
 	} while(0);
 	/** END HW1 BLOCK */
 	
