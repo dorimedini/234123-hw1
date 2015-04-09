@@ -635,14 +635,12 @@ int do_fork(unsigned long clone_flags, unsigned long stack_start,
 	 *
 	 * If not, goto bad_fork_free
 	 */
-	// DEBUG printk("In do_fork()\n   current->pid=%d\n",current->pid);
 	do {
 		// Iterate starting at ourselves (we need to check if we're making
 		// too many kids). Also note that this process may be the SWAPPER
 		// so add tests for pid != 0, apart from the climb until INIT.
 		struct task_struct *proc;
-		for (proc = current; proc && proc->pid != 1 && proc->pid != 0; proc = proc->p_pptr) {	// Let's get this to work first
-//		for (proc = current; proc && proc->pid != 1 && proc->pid != 0; proc = proc->real_dad) {	// Desired behaviour
+		for (proc = current; proc && proc->pid != 1 && proc->pid != 0; proc = proc->real_dad) {
 			if (proc->max_proc_from_above <= proc->subtree_size &&	// Check if we've overreached the limit
 				proc->max_proc_from_above >= 0) {					// and that the limit exists
 				goto bad_fork_free;
@@ -813,7 +811,6 @@ int do_fork(unsigned long clone_flags, unsigned long stack_start,
 		
 		// Update subtree sizes
 		struct task_struct *proc;
-//		for (proc = current; proc && proc->pid != 1 && proc->pid != 0; proc = proc->p_pptr) {	// Let's get this to work first
 		for (proc = current; proc && proc->pid != 1 && proc->pid != 0; proc = proc->real_dad) {	// Desired behaviour
 			proc->subtree_size++;
 		}
