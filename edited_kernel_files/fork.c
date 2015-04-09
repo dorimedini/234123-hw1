@@ -641,6 +641,7 @@ int do_fork(unsigned long clone_flags, unsigned long stack_start,
 		// too many kids). Also note that this process may be the SWAPPER
 		// so add tests for pid != 0, apart from the climb until INIT.
 		struct task_struct *proc;
+		// Helllllooooo
 		for (proc = current; proc && proc->pid != 1 && proc->pid != 0; proc = proc->p_pptr) {	// Let's get this to work first
 //		for (proc = current; proc && proc->pid != 1 && proc->pid != 0; proc = proc->real_dad) {	// Desired behaviour
 			if (proc->max_proc_from_above <= proc->subtree_size &&	// Check if we've overreached the limit
