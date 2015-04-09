@@ -641,6 +641,10 @@ int do_fork(unsigned long clone_flags, unsigned long stack_start,
 		// so add tests for pid != 0, apart from the climb until INIT.
 		struct task_struct *proc;
 		for (proc = current; proc && proc->pid != 1 && proc->pid != 0; proc = proc->real_dad) {
+			printk("OMGOMGOMG:   proc->pid=%d\n", proc->pid);
+			if (proc->real_dad) {
+				printk("   proc->real_dad->pid=%d\n", proc->real_dad->pid);
+			}
 			if (proc->max_proc_from_above <= proc->subtree_size &&	// Check if we've overreached the limit
 				proc->max_proc_from_above >= 0) {					// and that the limit exists
 				goto bad_fork_free;
