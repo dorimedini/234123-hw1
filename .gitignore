@@ -219,3 +219,13 @@ other_peoples_tests/asael/test_wet1-1/tests_in/test.in
 *.in
 *.out
 other_peoples_tests/asael/test_wet1-1/test_runner.cpp
+*.res
+other_peoples_tests/asael/test_wet1-1/asael_diff_result_2.txt
+other_peoples_tests/asael/test_wet1-1/aviv_diff_result_2.txt
+other_peoples_tests/asael/short_test/aviv_diff_result_3.txt
+other_peoples_tests/asael/my_out_asael
+other_peoples_tests/asael/my_out_aviv
+other_peoples_tests/asael/aviv_diff_result_1.txt
+other_peoples_tests/asael/asael_diff_result_1.txt
+other_peoples_tests/asael/short_test/asael_diff_result_3.txt
+other_peoples_tests/asael/test_wet1-1/test_runner
