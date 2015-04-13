@@ -14,8 +14,9 @@
  * - If too many processes are created, sets errno=EAGAIN
  */
 void test_return_values() {
-	
-	
+	set_child_max_proc(2);
+	printf("%d",get_max_proc());
+	get_subproc_count();
 	SUCCESS();
 }
 
@@ -67,7 +68,6 @@ void test_return_values() {
  */
 void test_process_overflow() {
 	
-	
 	SUCCESS();
 }
 
@@ -85,7 +85,7 @@ int main() {
 	start();
 	
 	// Tests
-	
+	test_return_values();
 	
 	// Print end
 	end();

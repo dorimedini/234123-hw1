@@ -1,3 +1,0 @@
-entry.S:		/usr/src/linux...custom/arch/i386/kernel/
-sched.h:		/usr/src/linux...custom/include/linux/
-Makefile:		/usr/src/linux...custom/arch/i386/kernel/

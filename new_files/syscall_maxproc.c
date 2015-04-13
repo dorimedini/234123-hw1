@@ -19,14 +19,18 @@ int sys_set_child_max_proc(int limit) {
 		return -EINVAL;
 	}
 	
-	current->max_proc_for_children = limit;			// Set the limit
+	current->max_proc_for_children = limit < 0 ? -1 : limit;	// Set the limit. If negative, set to -1
 	return 0;
 	
 }
 
 
 int sys_get_max_proc() {
-	return current->max_proc_from_above;
+	int max = current->max_proc_from_above;
+	if (max < 0) {
+		return -EINVAL;
+	}
+	return max;
 }
 
 

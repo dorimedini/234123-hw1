@@ -10,6 +10,14 @@
 extern int errno;
 
 /**
+ * Wrapper declarations
+ */
+int set_child_max_proc_wrapper(int);
+int get_max_proc_wrapper();
+int get_subproc_count_wrapper();
+
+
+/**
  * Sets the maximum number of processes each child may create
  * in it's process tree.
  *
