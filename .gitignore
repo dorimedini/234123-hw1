@@ -229,3 +229,4 @@ other_peoples_tests/asael/aviv_diff_result_1.txt
 other_peoples_tests/asael/asael_diff_result_1.txt
 other_peoples_tests/asael/short_test/asael_diff_result_3.txt
 other_peoples_tests/asael/test_wet1-1/test_runner
+compile_and_run_tests.sh
