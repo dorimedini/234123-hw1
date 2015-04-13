@@ -1,0 +1,63 @@
+1: errno: Invalid argument
+2: errno: Success
+3: errno: Invalid argument
+4: errno: Success
+5: process p0 has max_proc value of 5
+6: errno: Success
+7: errno: Success
+8: process main has 1 subprocesses
+9: errno: Success
+10: process p0 has 0 subprocesses
+11: errno: Success
+12: process p0 has max_proc value of 5
+13: errno: Success
+14: unknown process: p1
+15: process main has 1 subprocesses
+16: errno: Success
+17: errno: Success
+18: errno: Invalid argument
+19: process p0 has 0 subprocesses
+20: errno: Success
+21: errno: Success
+22: errno: Success
+23: errno: Success
+24: errno: Success
+25: process p0 has 4 subprocesses
+26: errno: Success
+27: errno: Success
+28: errno: Invalid argument
+29: errno: Invalid argument
+30: errno: Resource temporarily unavailable
+31: errno: Success
+32: process p0 has 4 subprocesses
+33: errno: Success
+34: errno: Success
+35: process p0 has 5 subprocesses
+36: errno: Success
+37: errno: Resource temporarily unavailable
+38: errno: Success
+39: errno: Success
+40: process p0 has 5 subprocesses
+41: errno: Success
+42: errno: Resource temporarily unavailable
+43: errno: Success
+44: errno: Success
+45: process main has 7 subprocesses
+46: errno: Success
+47: errno: Resource temporarily unavailable
+48: errno: Success
+49: errno: Success
+50: errno: Success
+51: errno: Success
+52: errno: Success
+53: errno: Success
+54: errno: Success
+55: process h has 6 subprocesses
+56: errno: Success
+57: errno: Invalid argument
+58: errno: Success
+59: errno: Success
+60: errno: Invalid argument
+61: errno: Invalid argument
+62: process i7 has max_proc value of 0
+63: errno: Success
