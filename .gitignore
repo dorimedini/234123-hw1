@@ -214,3 +214,8 @@ pip-log.txt
 
 #Mr Developer
 .mr.developer.cfg
+other_peoples_tests/asael/test_wet1-1/run_tests.sh
+other_peoples_tests/asael/test_wet1-1/tests_in/test.in
+*.in
+*.out
+other_peoples_tests/asael/test_wet1-1/test_runner.cpp
